@@ -1,0 +1,16 @@
+nav {
+  background-color: #1976d2;
+  padding: 10px;
+  text-align: center;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+  margin: 0 15px;
+  font-weight: bold;
+}
+
+nav a.active {
+  text-decoration: underline;
+}

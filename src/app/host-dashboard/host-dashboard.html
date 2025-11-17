@@ -1,0 +1,173 @@
+<div class="min-h-screen bg-gradient-to-br from-purple-50 to-pink-100 p-6">
+  <!-- Header with Logout -->
+  <div class="max-w-5xl mx-auto mb-8 flex justify-between items-center">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-800">Host Dashboard</h1>
+      <p class="text-gray-600 mt-1">Manage student communications and passwords</p>
+    </div>
+    <button 
+      (click)="logout()"
+      class="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition shadow">
+      Logout
+    </button>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div class="max-w-5xl mx-auto mb-6">
+    <div class="flex gap-2 bg-white rounded-lg p-2 shadow">
+      <button 
+        (click)="activeTab = 'message'"
+        [ngClass]="activeTab === 'message' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-700'"
+        class="flex-1 px-4 py-3 rounded-lg font-semibold transition">
+        📧 Send Messages
+      </button>
+      <button 
+        (click)="activeTab = 'password'"
+        [ngClass]="activeTab === 'password' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-700'"
+        class="flex-1 px-4 py-3 rounded-lg font-semibold transition">
+        🔑 Change Password
+      </button>
+      <button 
+        (click)="activeTab = 'students'"
+        [ngClass]="activeTab === 'students' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-700'"
+        class="flex-1 px-4 py-3 rounded-lg font-semibold transition">
+        👥 View Students
+      </button>
+    </div>
+  </div>
+
+  <!-- Send Messages Tab -->
+  <div *ngIf="activeTab === 'message'" class="max-w-5xl mx-auto">
+    <div class="bg-white rounded-2xl shadow-lg p-8">
+      <h2 class="text-2xl font-bold text-gray-800 mb-6">Send Email to Students</h2>
+
+      <!-- Info Message -->
+      <div *ngIf="info" 
+           [ngClass]="info.includes('✅') ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'"
+           class="mb-6 p-4 rounded-lg border">
+        {{ info }}
+      </div>
+
+      <!-- Form -->
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Student Username (Optional)</label>
+          <input 
+            [(ngModel)]="username"
+            placeholder="Leave empty to send to all students"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition">
+          <p class="text-xs text-gray-500 mt-1">💡 Leave blank to broadcast to all students</p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Subject</label>
+          <input 
+            [(ngModel)]="subject"
+            placeholder="Email subject"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Message</label>
+          <textarea 
+            [(ngModel)]="message"
+            rows="6"
+            placeholder="Type your message here..."
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition resize-none"></textarea>
+        </div>
+
+        <button 
+          (click)="send()"
+          class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition shadow-lg">
+          📨 Send Message
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Change Password Tab -->
+  <div *ngIf="activeTab === 'password'" class="max-w-5xl mx-auto">
+    <div class="bg-white rounded-2xl shadow-lg p-8">
+      <h2 class="text-2xl font-bold text-gray-800 mb-6">Change Student Password</h2>
+
+      <!-- Info Message -->
+      <div *ngIf="passwordInfo" 
+           [ngClass]="passwordInfo.includes('✅') ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'"
+           class="mb-6 p-4 rounded-lg border">
+        {{ passwordInfo }}
+      </div>
+
+      <!-- Form -->
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Student Username</label>
+          <input 
+            [(ngModel)]="selectedStudent"
+            placeholder="Enter student username"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+          <input 
+            [(ngModel)]="newPassword"
+            type="password"
+            placeholder="Enter new password (min 6 characters)"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition">
+        </div>
+
+        <button 
+          (click)="changePassword()"
+          class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition shadow-lg">
+          🔑 Change Password
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Students List Tab -->
+  <div *ngIf="activeTab === 'students'" class="max-w-5xl mx-auto">
+    <div class="bg-white rounded-2xl shadow-lg p-8">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">All Students</h2>
+        <button 
+          (click)="loadStudents()"
+          class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
+          🔄 Refresh
+        </button>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="loadingStudents" class="text-center py-12">
+        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+        <p class="mt-4 text-gray-600">Loading students...</p>
+      </div>
+
+      <!-- No Students -->
+      <div *ngIf="!loadingStudents && students.length === 0" class="text-center py-12">
+        <p class="text-gray-500">No students found</p>
+      </div>
+
+      <!-- Students List -->
+      <div *ngIf="!loadingStudents && students.length > 0" class="space-y-3">
+        <div *ngFor="let student of students" 
+             class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+          <div>
+            <h3 class="font-semibold text-gray-800">{{ student.username }}</h3>
+            <p class="text-sm text-gray-600">{{ student.email }}</p>
+          </div>
+          <span class="text-xs px-3 py-1 bg-blue-100 text-blue-700 rounded-full font-semibold">
+            Student
+          </span>
+        </div>
+      </div>
+
+      <!-- Total Count -->
+      <div *ngIf="!loadingStudents && students.length > 0" class="mt-6 pt-6 border-t border-gray-200">
+        <p class="text-center text-gray-600">
+          Total Students: <span class="font-bold text-purple-600">{{ students.length }}</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

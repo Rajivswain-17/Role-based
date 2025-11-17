@@ -1,0 +1,108 @@
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+  <!-- Header with Student Name and Logout -->
+  <div class="max-w-5xl mx-auto mb-8 flex justify-between items-center">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-800">Student Dashboard</h1>
+      <p class="text-gray-600 mt-1">
+        Welcome, <span class="font-semibold text-blue-600">{{ studentUsername }}</span>
+      </p>
+      <p class="text-gray-500 text-sm mt-1">View messages from hosts</p>
+    </div>
+    <button 
+      (click)="logout()"
+      class="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition shadow">
+      Logout
+    </button>
+  </div>
+
+  <!-- Message Display -->
+  <div *ngIf="message" 
+       [ngClass]="message.includes('✅') ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'"
+       class="max-w-5xl mx-auto mb-6 p-4 rounded-lg border">
+    {{ message }}
+  </div>
+
+  <!-- Refresh Button -->
+  <div class="max-w-5xl mx-auto mb-6">
+    <button 
+      (click)="loadMessages()"
+      class="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition shadow-lg">
+      🔄 Refresh Messages
+    </button>
+  </div>
+
+  <!-- Messages Container -->
+  <div class="max-w-5xl mx-auto">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="text-center py-12">
+      <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <p class="mt-4 text-gray-600">Loading messages...</p>
+    </div>
+
+    <!-- No Messages -->
+    <div *ngIf="!loading && messages.length === 0" 
+         class="bg-white rounded-2xl shadow-lg p-12 text-center">
+      <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+      </svg>
+      <h3 class="text-xl font-semibold text-gray-700">No messages yet</h3>
+      <p class="text-gray-500 mt-2">You'll see messages from hosts here</p>
+    </div>
+
+    <!-- Messages List -->
+    <div *ngIf="!loading && messages.length > 0" class="space-y-4">
+      <div *ngFor="let msg of messages; let i = index" 
+           class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition overflow-hidden">
+        
+        <!-- Message Header - Always visible -->
+        <div class="p-6 cursor-pointer" (click)="toggleMessage(i)">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="inline-block px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
+                  {{ msg.recipientType === 'ALL' ? 'Broadcast' : 'Direct' }}
+                </span>
+                <span class="text-xs text-gray-500">
+                  {{ formatDate(msg.sentAt) }}
+                </span>
+              </div>
+              <h3 class="text-xl font-bold text-gray-800">{{ msg.subject }}</h3>
+              <p class="text-sm text-gray-500 mt-1">From: {{ msg.senderUsername }}</p>
+            </div>
+            
+            <!-- Expand/Collapse Icon and Delete Button -->
+            <div class="flex items-center gap-2 ml-4">
+              <!-- Delete Button -->
+              <button 
+                (click)="deleteMessage(msg.id, $event)"
+                [disabled]="deleting"
+                class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Delete message">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+              </button>
+
+              <!-- Expand/Collapse Icon -->
+              <div>
+                <svg *ngIf="!expandedMessages[i]" class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+                <svg *ngIf="expandedMessages[i]" class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message Content - Expandable -->
+        <div *ngIf="expandedMessages[i]" class="px-6 pb-6 border-t border-gray-100">
+          <div class="mt-4 bg-gray-50 rounded-lg p-4">
+            <p class="text-gray-700 leading-relaxed whitespace-pre-wrap">{{ msg.message }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
